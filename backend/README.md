@@ -8,8 +8,8 @@ This folder contains the FastAPI backend foundation for MarketMind.
 - Environment-based configuration
 - PostgreSQL connection wiring
 - Health endpoints only
+- Real JWT auth endpoints
 - No business endpoints yet
-- No auth implementation yet
 - No ETL jobs yet
 - No AI services yet
 
@@ -47,3 +47,31 @@ SQLAlchemy models mirror the executable PostgreSQL schema for backend developmen
 - Run model validation with `python -m app.db.validate_models`
 - The schema is still created by `database/marketmind_schema_v2_postgresql.sql` only
 - SQLAlchemy does not create or modify database tables in this project
+
+## Auth Testing
+
+Before running auth flows:
+
+- `backend/.env` must contain `DATABASE_URL`
+- `backend/.env` must contain `JWT_SECRET_KEY`
+- Do not commit `backend/.env`
+
+Run the backend:
+
+1. `cd backend`
+2. `.\.venv\Scripts\activate`
+3. `pip install -r requirements.txt`
+4. `uvicorn app.main:app --reload`
+
+Register a user:
+
+- `POST /auth/register`
+
+Login:
+
+- `POST /auth/login`
+- `POST /auth/token` is also available for Swagger OAuth2 flow
+
+Read the current user:
+
+- `GET /auth/me` with `Authorization: Bearer <token>`
