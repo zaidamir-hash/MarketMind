@@ -92,3 +92,30 @@ Notes:
 
 - This phase does not use yfinance yet
 - `POST`, `PATCH`, and `DELETE` do not create price history, risk indicators, or any fake market data
+
+## yfinance ETL
+
+Purpose:
+
+- onboard asset metadata from yfinance into `assets`
+- fetch OHLCV candles from yfinance into `price_history`
+- write ETL execution status to `scraper_logs`
+
+Notes:
+
+- risk indicators are not implemented in this phase
+- yfinance field availability can vary by ticker
+- this phase does not use yfinance news or any external news source
+
+Protected API endpoints:
+
+- `POST /etl/onboard-asset`
+- `POST /etl/fetch-prices`
+- `POST /etl/fetch-prices/all-active`
+- `GET /etl/logs`
+
+CLI commands:
+
+- `python -m app.etl.run_yfinance_etl onboard AAPL`
+- `python -m app.etl.run_yfinance_etl prices AAPL --period 5d --interval 5m`
+- `python -m app.etl.run_yfinance_etl prices-all --period 5d --interval 5m`
