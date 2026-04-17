@@ -10,7 +10,17 @@ from app.schemas.ai import (
     PredictionRead,
     SignalRead,
 )
+from app.schemas.alert import AlertCreate, AlertLogRead, AlertRead
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenPayload, TokenResponse
+from app.schemas.portfolio import (
+    PortfolioCreate,
+    PortfolioHoldingRead,
+    PortfolioOptimisationRead,
+    PortfolioOptimizeRequest,
+    PortfolioPerformanceRead,
+    PortfolioRead,
+    PortfolioUpdate,
+)
 from app.schemas.risk_indicator import (
     RiskIndicatorBatchItem,
     RiskIndicatorBatchResponse,
@@ -18,19 +28,30 @@ from app.schemas.risk_indicator import (
     RiskIndicatorComputeResponse,
     RiskIndicatorRead,
 )
+from app.schemas.trade import TradeCreate, TradeRead
 from app.schemas.user import CurrentUserRead, UserRead
 
 __all__ = [
-    "AssetBase",
-    "AssetCreate",
-    "AssetRead",
-    "AssetUpdate",
     "AIBatchItem",
     "AIBatchResponse",
     "AIPipelineRequest",
     "AIPipelineResponse",
+    "AlertCreate",
+    "AlertLogRead",
+    "AlertRead",
+    "AssetBase",
+    "AssetCreate",
+    "AssetRead",
+    "AssetUpdate",
     "HMMStateRead",
     "LoginRequest",
+    "PortfolioCreate",
+    "PortfolioHoldingRead",
+    "PortfolioOptimisationRead",
+    "PortfolioOptimizeRequest",
+    "PortfolioPerformanceRead",
+    "PortfolioRead",
+    "PortfolioUpdate",
     "PredictionRead",
     "RegisterRequest",
     "RiskIndicatorBatchItem",
@@ -41,6 +62,8 @@ __all__ = [
     "SignalRead",
     "TokenPayload",
     "TokenResponse",
+    "TradeCreate",
+    "TradeRead",
     "UserRead",
     "CurrentUserRead",
 ]

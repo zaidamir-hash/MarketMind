@@ -4,14 +4,16 @@ This folder contains the FastAPI backend foundation for MarketMind.
 
 ## Current State
 
-- FastAPI app foundation only
+- FastAPI backend with local API routes
 - Environment-based configuration
 - PostgreSQL connection wiring
-- Health endpoints only
+- Health endpoints
 - Real JWT auth endpoints
-- No business endpoints yet
-- No ETL jobs yet
-- No AI services yet
+- Assets API
+- yfinance ETL routes and CLI
+- Risk indicator pipeline
+- Core AI modules
+- Portfolio, trade, alert, and optimizer APIs
 
 ## Local Run Instructions
 
@@ -201,3 +203,66 @@ Notes:
 - the AI modules are intentionally simple and stable for demo use
 - outputs depend on actual stored market data and will fail clearly if data is missing
 - Genetic Algorithm portfolio optimization is intentionally deferred until portfolio and holding APIs exist
+
+## Portfolio APIs
+
+Protected portfolio endpoints:
+
+- `POST /portfolios`
+- `GET /portfolios`
+- `GET /portfolios/{portfolio_id}`
+- `PATCH /portfolios/{portfolio_id}`
+- `GET /portfolios/{portfolio_id}/holdings`
+- `GET /portfolios/{portfolio_id}/performance`
+- `POST /portfolios/{portfolio_id}/optimize`
+- `GET /portfolios/{portfolio_id}/optimisations`
+
+Notes:
+
+- portfolios are user-scoped
+- holdings and current cash are managed by database triggers after trade inserts
+- run yfinance ETL first so holdings and performance can resolve latest prices
+
+## Trade APIs
+
+Protected trade endpoints:
+
+- `POST /trades`
+- `GET /trades/portfolio/{portfolio_id}`
+- `GET /trades/{trade_id}`
+
+Notes:
+
+- trades use the latest stored `price_history` close as `executed_price`
+- if no stored price exists for an asset, the API returns a clear error telling you to run yfinance ETL first
+- the app inserts into `trades` only; the database triggers update holdings and portfolio cash
+
+## Alert APIs
+
+Protected alert endpoints:
+
+- `POST /alerts`
+- `GET /alerts`
+- `GET /alerts/logs`
+- `PATCH /alerts/{alert_id}/deactivate`
+- `DELETE /alerts/{alert_id}`
+
+Notes:
+
+- creating an alert inserts into `alerts` only
+- `alert_logs` are created by the database trigger after matching `price_history` inserts
+- deactivation is soft only; alerts are not physically deleted in this phase
+
+## Portfolio Optimization
+
+This phase uses a simple demo-friendly random weight search over held assets with stored `1d` price history.
+
+Requirements:
+
+- the portfolio must hold at least 2 assets
+- both assets must have stored `price_history` rows; `1d` is preferred and lower intervals are used as fallback
+
+Notes:
+
+- optimization writes to `portfolio_optimisation`
+- holdings, cash, and alert logs remain database-trigger-managed
