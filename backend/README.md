@@ -160,3 +160,44 @@ Notes:
 - yfinance data availability can vary by ticker and runtime connectivity
 - insufficient daily history prevents insertion of incomplete risk rows
 - this phase does not compute Bayesian `risk_score` or `risk_label`
+
+## AI Modules
+
+This phase adds simple, demo-friendly AI outputs built from stored MarketMind data.
+
+What it does:
+
+- detects a simple HMM-style market regime from stored `price_history`
+- creates a simple `LinearRegression` next-price prediction
+- updates the latest `risk_indicators` row with a simplified Bayesian-style `risk_score` and `risk_label`
+- generates a `BUY`, `HOLD`, or `SELL` market signal
+
+Prerequisites:
+
+- `price_history` rows must already exist for the target asset
+- `risk_indicators` rows should already exist before Bayesian-style risk scoring runs
+
+Protected API endpoints:
+
+- `POST /ai/run/{symbol}`
+- `POST /ai/run-all`
+
+Read endpoints:
+
+- `GET /ai/predictions`
+- `GET /ai/predictions/symbol/{symbol}`
+- `GET /ai/signals`
+- `GET /ai/signals/symbol/{symbol}`
+- `GET /ai/regimes`
+- `GET /ai/regimes/symbol/{symbol}`
+
+CLI commands:
+
+- `python -m app.ai.run_ai_pipeline run AAPL`
+- `python -m app.ai.run_ai_pipeline run-all`
+
+Notes:
+
+- the AI modules are intentionally simple and stable for demo use
+- outputs depend on actual stored market data and will fail clearly if data is missing
+- Genetic Algorithm portfolio optimization is intentionally deferred until portfolio and holding APIs exist

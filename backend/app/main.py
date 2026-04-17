@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
+from app.routers.ai import router as ai_router
 from app.routers.auth import router as auth_router
 from app.routers.assets import router as assets_router
 from app.routers.etl import router as etl_router
@@ -39,3 +40,4 @@ app.include_router(auth_router)
 app.include_router(assets_router)
 app.include_router(etl_router)
 app.include_router(risk_indicators_router)
+app.include_router(ai_router)
