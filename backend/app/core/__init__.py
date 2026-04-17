@@ -1,1 +1,1 @@
-"""Core backend configuration and security helpers."""
+"""Core backend helpers."""

@@ -1,1 +1,1 @@
-"""Database package for MarketMind backend."""
+"""Database helpers for MarketMind."""
