@@ -39,3 +39,11 @@ You can also run:
 - `python -m app.db.check_connection`
 
 This script loads backend settings, tests `SELECT 1`, and verifies that the `marketmind` schema exists.
+
+## SQLAlchemy Models
+
+SQLAlchemy models mirror the executable PostgreSQL schema for backend development.
+
+- Run model validation with `python -m app.db.validate_models`
+- The schema is still created by `database/marketmind_schema_v2_postgresql.sql` only
+- SQLAlchemy does not create or modify database tables in this project
