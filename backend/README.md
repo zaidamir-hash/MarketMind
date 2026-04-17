@@ -75,3 +75,20 @@ Login:
 Read the current user:
 
 - `GET /auth/me` with `Authorization: Bearer <token>`
+
+## Assets API Testing
+
+This phase adds manual asset CRUD over the existing `assets` table only.
+
+- `GET /assets`
+- `GET /assets/active`
+- `GET /assets/symbol/{symbol}`
+- `GET /assets/{asset_id}`
+- `POST /assets` requires Bearer token
+- `PATCH /assets/{asset_id}` requires Bearer token
+- `DELETE /assets/{asset_id}` soft-deactivates the asset and requires Bearer token
+
+Notes:
+
+- This phase does not use yfinance yet
+- `POST`, `PATCH`, and `DELETE` do not create price history, risk indicators, or any fake market data
