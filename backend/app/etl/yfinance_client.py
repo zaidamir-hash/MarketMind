@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
 import yfinance as yf
 
 from app.etl.etl_utils import classify_asset_type, normalize_symbol
+
+
+def _configure_yfinance_cache() -> None:
+    cache_dir = Path(__file__).resolve().parents[2] / ".cache" / "yfinance"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    yf.set_tz_cache_location(str(cache_dir))
+
+
+_configure_yfinance_cache()
 
 
 def get_ticker(symbol: str) -> yf.Ticker:

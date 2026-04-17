@@ -119,3 +119,44 @@ CLI commands:
 - `python -m app.etl.run_yfinance_etl onboard AAPL`
 - `python -m app.etl.run_yfinance_etl prices AAPL --period 5d --interval 5m`
 - `python -m app.etl.run_yfinance_etl prices-all --period 5d --interval 5m`
+
+## Risk Indicators
+
+This phase computes deterministic risk features from yfinance daily market data and inserts them into `risk_indicators`.
+
+Computed fields in this phase:
+
+- `volatility_30d`
+- `rsi_14`
+- `volume_ratio`
+- `price_vs_52w_high`
+- `price_vs_sma50`
+- `beta` when available from yfinance
+- deterministic `volatility_label`, `momentum_label`, and `volume_label`
+
+Not computed in this phase:
+
+- `risk_score` remains `NULL`
+- `risk_label` remains `NULL`
+- Bayesian/AI risk inference is deferred to the later AI modules phase
+
+Protected API endpoints:
+
+- `POST /risk-indicators/compute`
+- `POST /risk-indicators/compute/all-active`
+
+Read endpoints:
+
+- `GET /risk-indicators`
+- `GET /risk-indicators/symbol/{symbol}`
+
+CLI commands:
+
+- `python -m app.etl.run_risk_indicators compute AAPL`
+- `python -m app.etl.run_risk_indicators compute-all`
+
+Notes:
+
+- yfinance data availability can vary by ticker and runtime connectivity
+- insufficient daily history prevents insertion of incomplete risk rows
+- this phase does not compute Bayesian `risk_score` or `risk_label`
