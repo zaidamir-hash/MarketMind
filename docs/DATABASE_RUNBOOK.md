@@ -45,7 +45,7 @@ psql -U postgres -d postgres -f "database/marketmind_schema_v2_postgresql.sql"
 Forward-slash Windows path example:
 
 ```powershell
-psql -U postgres -d postgres -f "C:/Users/alize/Desktop/Uni Stuff/AI+DB+SDA Project/database/marketmind_schema_v2_postgresql.sql"
+psql -U postgres -d postgres -f "C:/path/to/MarketMind/database/marketmind_schema_v2_postgresql.sql"
 ```
 
 After the schema script finishes, you can connect directly to `marketmind`:
@@ -112,7 +112,7 @@ Two simple fixes:
 Example full-path command:
 
 ```powershell
-& "C:/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres -d marketmind -f "C:/Users/alize/Desktop/Uni Stuff/AI+DB+SDA Project/database/verification_queries.sql"
+& "C:/Program Files/PostgreSQL/<version>/bin/psql.exe" -U postgres -d marketmind -f "C:/path/to/MarketMind/database/verification_queries.sql"
 ```
 
 ## Expected Verification Goal

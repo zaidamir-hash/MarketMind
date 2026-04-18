@@ -10,11 +10,23 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.models import AIPrediction, Asset, PriceHistory
-from app.etl.etl_utils import decimal_safe, normalize_symbol, utc_now
+from app.etl.etl_utils import decimal_safe, normalize_symbol
 from app.services.asset_service import get_asset_by_symbol
 
 
 PREFERRED_INTERVALS = ("1d", "1h", "5min")
+
+
+def _next_prediction_timestamp(price_frame: pd.DataFrame) -> object:
+    latest_row = price_frame.iloc[-1]
+    latest_recorded_at = latest_row["recorded_at"]
+    interval = latest_row.get("interval")
+
+    if interval == "5min":
+        return latest_recorded_at + timedelta(minutes=5)
+    if interval == "1h":
+        return latest_recorded_at + timedelta(hours=1)
+    return latest_recorded_at + timedelta(days=1)
 
 
 def _quantize_decimal(value: object, places: int) -> Decimal | None:
@@ -116,7 +128,7 @@ def predict_price_for_asset(db: Session, symbol: str) -> AIPrediction:
         model_type="LinearRegression",
         predicted_price=_quantize_decimal(predicted_price, 6),
         confidence=_quantize_decimal(confidence, 4),
-        predicted_for=utc_now() + timedelta(days=1),
+        predicted_for=_next_prediction_timestamp(price_frame),
         actual_price=None,
     )
     db.add(prediction)

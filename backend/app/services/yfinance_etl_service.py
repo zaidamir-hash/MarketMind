@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.db.models import Asset, PriceHistory, ScraperLog
 from app.etl.etl_utils import (
     decimal_safe,
+    interval_to_yfinance,
     int_safe,
     normalize_interval,
     normalize_symbol,
@@ -42,7 +43,7 @@ def onboard_asset_from_yfinance(db: Session, symbol: str) -> Asset:
         else:
             asset.name = metadata["name"] or asset.name
             asset.asset_type = metadata["asset_type"] or asset.asset_type
-            asset.exchange = metadata["exchange"]
+            asset.exchange = metadata["exchange"] or asset.exchange
             asset.currency = metadata["currency"] or asset.currency
             asset.is_active = True
 
@@ -64,6 +65,7 @@ def fetch_prices_for_asset(
 ) -> int:
     normalized_symbol = normalize_symbol(symbol)
     normalized_interval = normalize_interval(interval)
+    yfinance_interval = interval_to_yfinance(interval)
     log = create_scraper_log_start(db, f"yfinance_prices_{normalized_symbol}_{normalized_interval}")
 
     try:
@@ -73,7 +75,7 @@ def fetch_prices_for_asset(
                 f"Asset '{normalized_symbol}' does not exist. Onboard it first."
             )
 
-        history = fetch_price_history(normalized_symbol, period=period, interval=interval)
+        history = fetch_price_history(normalized_symbol, period=period, interval=yfinance_interval)
         if history.empty:
             finish_scraper_log_success(db, log, rows_inserted=0)
             return 0

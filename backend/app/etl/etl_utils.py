@@ -25,6 +25,16 @@ def normalize_interval(interval: str) -> str:
     return mapping[normalized]
 
 
+def interval_to_yfinance(interval: str) -> str:
+    canonical_interval = normalize_interval(interval)
+    mapping = {
+        "5min": "5m",
+        "1h": "1h",
+        "1d": "1d",
+    }
+    return mapping[canonical_interval]
+
+
 def decimal_safe(value: object) -> Decimal | None:
     if value is None or pd.isna(value):
         return None

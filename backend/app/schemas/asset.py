@@ -81,3 +81,31 @@ class AssetRead(BaseModel):
     currency: str
     is_active: bool
     added_at: datetime
+
+
+class AssetCatalogOptionRead(BaseModel):
+    asset_id: uuid.UUID | None = None
+    symbol: str
+    display_name: str
+    country: str
+    is_crypto: bool
+    asset_type: str
+    exchange: str | None = None
+    currency: str
+    is_onboarded: bool
+    is_active: bool
+
+
+class AssetCatalogCategoryRead(BaseModel):
+    category_id: str
+    category_label: str
+    country: str
+    is_crypto: bool
+    options: list[AssetCatalogOptionRead]
+
+
+class AssetCatalogRead(BaseModel):
+    catalog_name: str
+    total_categories: int
+    total_options: int
+    categories: list[AssetCatalogCategoryRead]

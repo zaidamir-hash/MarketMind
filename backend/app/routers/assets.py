@@ -8,12 +8,13 @@ from sqlalchemy.orm import Session
 from app.db.models import User
 from app.db.session import get_db
 from app.dependencies.auth import get_current_active_user
-from app.schemas.asset import AssetCreate, AssetRead, AssetUpdate
+from app.schemas.asset import AssetCatalogRead, AssetCreate, AssetRead, AssetUpdate
 from app.services.asset_service import (
     create_asset,
     deactivate_asset,
     get_asset_by_id,
     get_asset_by_symbol,
+    list_asset_catalog,
     list_assets,
     update_asset,
 )
@@ -35,6 +36,11 @@ def read_assets(
 def read_active_assets(db: Session = Depends(get_db)) -> list[AssetRead]:
     assets = list_assets(db, active_only=True)
     return [AssetRead.model_validate(asset) for asset in assets]
+
+
+@router.get("/catalog", response_model=AssetCatalogRead)
+def read_asset_catalog(db: Session = Depends(get_db)) -> AssetCatalogRead:
+    return list_asset_catalog(db)
 
 
 @router.get("/symbol/{symbol}", response_model=AssetRead)

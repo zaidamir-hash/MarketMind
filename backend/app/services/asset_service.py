@@ -6,7 +6,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.models import Asset
-from app.schemas.asset import AssetCreate, AssetUpdate, normalize_symbol
+from app.schemas.asset import (
+    AssetCatalogRead,
+    AssetCatalogCategoryRead,
+    AssetCatalogOptionRead,
+    AssetCreate,
+    AssetUpdate,
+    normalize_symbol,
+)
+from app.services.asset_catalog import load_demo_asset_universe
 
 
 def list_assets(db: Session, active_only: bool = False) -> list[Asset]:
@@ -68,3 +76,57 @@ def deactivate_asset(db: Session, asset_id: uuid.UUID) -> Asset | None:
     db.commit()
     db.refresh(asset)
     return asset
+
+
+def list_asset_catalog(db: Session) -> AssetCatalogRead:
+    catalog = load_demo_asset_universe()
+    raw_categories = catalog.get("categories", [])
+    symbols = [
+        option["symbol"]
+        for category in raw_categories
+        for option in category.get("options", [])
+    ]
+
+    existing_assets = {
+        asset.symbol: asset
+        for asset in db.scalars(
+            select(Asset).where(Asset.symbol.in_(symbols))
+        ).all()
+    }
+
+    categories: list[AssetCatalogCategoryRead] = []
+    for category in raw_categories:
+        options: list[AssetCatalogOptionRead] = []
+        for option in category.get("options", []):
+            asset = existing_assets.get(option["symbol"])
+            options.append(
+                AssetCatalogOptionRead(
+                    asset_id=asset.asset_id if asset is not None else None,
+                    symbol=option["symbol"],
+                    display_name=asset.name if asset is not None and asset.name else option["display_name"],
+                    country=option["country"],
+                    is_crypto=option["is_crypto"],
+                    asset_type=asset.asset_type if asset is not None else option["asset_type"],
+                    exchange=asset.exchange if asset is not None and asset.exchange else option.get("exchange"),
+                    currency=asset.currency if asset is not None else option["currency"],
+                    is_onboarded=asset is not None,
+                    is_active=bool(asset.is_active) if asset is not None else False,
+                )
+            )
+
+        categories.append(
+            AssetCatalogCategoryRead(
+                category_id=category["category_id"],
+                category_label=category["category_label"],
+                country=category["country"],
+                is_crypto=category["is_crypto"],
+                options=options,
+            )
+        )
+
+    return AssetCatalogRead(
+        catalog_name=catalog.get("catalog_name", "MarketMind Demo Asset Universe"),
+        total_categories=len(categories),
+        total_options=sum(len(category.options) for category in categories),
+        categories=categories,
+    )

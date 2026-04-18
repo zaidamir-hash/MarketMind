@@ -1,0 +1,495 @@
+{
+  "catalog_name": "MarketMind Demo Asset Universe",
+  "categories": [
+    {
+      "category_id": "pakistan-banking",
+      "category_label": "Pakistan Banking",
+      "country": "Pakistan",
+      "is_crypto": false,
+      "options": [
+        {
+          "symbol": "HBL.KA",
+          "display_name": "Habib Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "MCB.KA",
+          "display_name": "MCB Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "UBL.KA",
+          "display_name": "United Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "NBP.KA",
+          "display_name": "National Bank of Pakistan",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "BAFL.KA",
+          "display_name": "Bank Alfalah Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "MEBL.KA",
+          "display_name": "Meezan Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "BOP.KA",
+          "display_name": "The Bank of Punjab",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "AKBL.KA",
+          "display_name": "Askari Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "FABL.KA",
+          "display_name": "Faysal Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "ABL.KA",
+          "display_name": "Allied Bank Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        }
+      ]
+    },
+    {
+      "category_id": "pakistan-energy",
+      "category_label": "Pakistan Energy",
+      "country": "Pakistan",
+      "is_crypto": false,
+      "options": [
+        {
+          "symbol": "OGDC.KA",
+          "display_name": "Oil & Gas Development Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "PPL.KA",
+          "display_name": "Pakistan Petroleum Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "POL.KA",
+          "display_name": "Pakistan Oilfields Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "MARI.KA",
+          "display_name": "Mari Energies Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "PSO.KA",
+          "display_name": "Pakistan State Oil Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "SNGP.KA",
+          "display_name": "Sui Northern Gas Pipelines Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "SSGC.KA",
+          "display_name": "Sui Southern Gas Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "APL.KA",
+          "display_name": "Attock Petroleum Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "ATRL.KA",
+          "display_name": "Attock Refinery Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "PRL.KA",
+          "display_name": "Pakistan Refinery Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        }
+      ]
+    },
+    {
+      "category_id": "pakistan-cement",
+      "category_label": "Pakistan Cement",
+      "country": "Pakistan",
+      "is_crypto": false,
+      "options": [
+        {
+          "symbol": "LUCK.KA",
+          "display_name": "Lucky Cement Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "DGKC.KA",
+          "display_name": "DG Khan Cement Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "FCCL.KA",
+          "display_name": "Fauji Cement Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "MLCF.KA",
+          "display_name": "Maple Leaf Cement Factory Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "PIOC.KA",
+          "display_name": "Pioneer Cement Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "KOHC.KA",
+          "display_name": "Kohat Cement Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "CHCC.KA",
+          "display_name": "Cherat Cement Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "POWER.KA",
+          "display_name": "Power Cement Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "ACPL.KA",
+          "display_name": "Attock Cement Pakistan Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "BWCL.KA",
+          "display_name": "Bestway Cement Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        }
+      ]
+    },
+    {
+      "category_id": "pakistan-power",
+      "category_label": "Pakistan Power",
+      "country": "Pakistan",
+      "is_crypto": false,
+      "options": [
+        {
+          "symbol": "HUBC.KA",
+          "display_name": "Hub Power Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "KEL.KA",
+          "display_name": "K-Electric Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "KAPCO.KA",
+          "display_name": "Kot Addu Power Company Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "NPL.KA",
+          "display_name": "Nishat Power Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "NCPL.KA",
+          "display_name": "Nishat Chunian Power Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "LPL.KA",
+          "display_name": "Lalpir Power Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "EPQL.KA",
+          "display_name": "Engro Powergen Qadirpur Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "KOHE.KA",
+          "display_name": "Kohinoor Energy Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "PKGP.KA",
+          "display_name": "Pakgen Power Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        },
+        {
+          "symbol": "SPWL.KA",
+          "display_name": "Saif Power Limited",
+          "country": "Pakistan",
+          "is_crypto": false,
+          "asset_type": "STOCK",
+          "exchange": "PSX",
+          "currency": "PKR"
+        }
+      ]
+    },
+    {
+      "category_id": "crypto",
+      "category_label": "Crypto",
+      "country": "Global",
+      "is_crypto": true,
+      "options": [
+        {
+          "symbol": "BTC-USD",
+          "display_name": "Bitcoin USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "ETH-USD",
+          "display_name": "Ethereum USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "BNB-USD",
+          "display_name": "BNB USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "SOL-USD",
+          "display_name": "Solana USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "XRP-USD",
+          "display_name": "XRP USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "ADA-USD",
+          "display_name": "Cardano USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "DOGE-USD",
+          "display_name": "Dogecoin USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "TRX-USD",
+          "display_name": "TRON USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "DOT-USD",
+          "display_name": "Polkadot USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        },
+        {
+          "symbol": "LINK-USD",
+          "display_name": "Chainlink USD",
+          "country": "Global",
+          "is_crypto": true,
+          "asset_type": "CRYPTO",
+          "exchange": "CRYPTO",
+          "currency": "USD"
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,8 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+backend/.cache/
+**/pytest-cache-files-*/
 
 # Node
 node_modules/

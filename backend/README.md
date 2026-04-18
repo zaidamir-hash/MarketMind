@@ -14,6 +14,7 @@ This folder contains the FastAPI backend foundation for MarketMind.
 - Risk indicator pipeline
 - Core AI modules
 - Portfolio, trade, alert, and optimizer APIs
+- Curated 50-option demo asset universe
 
 ## Local Run Instructions
 
@@ -84,6 +85,7 @@ This phase adds manual asset CRUD over the existing `assets` table only.
 
 - `GET /assets`
 - `GET /assets/active`
+- `GET /assets/catalog`
 - `GET /assets/symbol/{symbol}`
 - `GET /assets/{asset_id}`
 - `POST /assets` requires Bearer token
@@ -94,6 +96,7 @@ Notes:
 
 - This phase does not use yfinance yet
 - `POST`, `PATCH`, and `DELETE` do not create price history, risk indicators, or any fake market data
+- `GET /assets/catalog` exposes the curated 50-option demo universe grouped into 5 categories for frontend dropdowns
 
 ## yfinance ETL
 
@@ -121,6 +124,13 @@ CLI commands:
 - `python -m app.etl.run_yfinance_etl onboard AAPL`
 - `python -m app.etl.run_yfinance_etl prices AAPL --period 5d --interval 5m`
 - `python -m app.etl.run_yfinance_etl prices-all --period 5d --interval 5m`
+- `python -m app.etl.bootstrap_demo_universe`
+
+Curated demo bootstrap:
+
+- `python -m app.etl.bootstrap_demo_universe` prepares the curated 50-option demo universe
+- It onboards all catalog assets, fetches stored daily and intraday price history, computes risk indicators, and runs the AI pipeline
+- The command is safe to rerun, but risk and AI snapshots are append-style records
 
 ## Risk Indicators
 
@@ -236,6 +246,7 @@ Notes:
 - trades use the latest stored `price_history` close as `executed_price`
 - if no stored price exists for an asset, the API returns a clear error telling you to run yfinance ETL first
 - the app inserts into `trades` only; the database triggers update holdings and portfolio cash
+- the frontend trade form uses category and asset dropdowns sourced from `GET /assets/catalog`, but the backend trade API still accepts the same `symbol` payload
 
 ## Alert APIs
 

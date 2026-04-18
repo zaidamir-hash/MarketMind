@@ -1,54 +1,118 @@
 # Architecture Overview
 
-MarketMind is organized as a local-only monorepo with a clear split between frontend, backend, database, ETL, and future analytics work.
+MarketMind is a local-only monorepo with a React frontend, a FastAPI backend, and a PostgreSQL database built strictly on Schema v2.
 
 ## Frontend
 
-- The frontend lives in `frontend/`
-- It uses React with JavaScript only
-- Vite is the planned local development tool
-- The frontend will later call backend APIs through a small service layer
+- Location: `frontend/`
+- Stack: React + Vite, JavaScript only
+- Responsibilities:
+  - register/login flows
+  - dashboard summaries
+  - assets, ETL, risk, AI, portfolio, trade, and alert pages
+  - token-aware API calls through `src/services/`
+
+The frontend talks to the backend over HTTP and uses Bearer tokens for protected actions.
 
 ## Backend
 
-- The backend lives in `backend/`
-- It uses FastAPI
-- It will later expose APIs for assets, portfolios, trades, alerts, and authentication
-- Authentication is planned as real JWT login, but not implemented during setup
+- Location: `backend/`
+- Stack: FastAPI, SQLAlchemy 2.0, Pydantic
+- Responsibilities:
+  - JWT authentication
+  - CRUD and workflow APIs
+  - ETL and analytics entrypoints
+  - portfolio/trade/alert business workflows
+  - local-only CORS configuration for the frontend
+
+Routers currently included in the app:
+
+- `health`
+- `auth`
+- `assets`
+- `etl`
+- `risk_indicators`
+- `ai`
+- `portfolios`
+- `trades`
+- `alerts`
 
 ## Database
 
-- The database uses PostgreSQL
-- The only schema definition is `database/marketmind_schema_v2_postgresql.sql`
-- The project must follow Database Schema v2 exactly
-- No Alembic or alternative migration system is part of the setup
+- Location: `database/marketmind_schema_v2_postgresql.sql`
+- Engine: PostgreSQL
+- Schema name: `marketmind`
+- Scope:
+  - 14 base tables
+  - 4 materialized views
+  - 6 triggers
+
+The executable SQL file is the only schema definition. The application does not create or migrate tables.
 
 ## yfinance ETL
 
-- ETL support is planned under the backend structure
-- yfinance is intended only for asset metadata, OHLCV, beta, market cap, and risk-feature source data
-- ETL remains local and schema-aligned
+ETL runs from backend modules and manual API/CLI entrypoints.
+
+It is used only for:
+
+- asset metadata
+- OHLCV price history
+- beta
+- market-cap source data
+- historical windows for risk feature calculations
+
+It writes to:
+
+- `assets`
+- `price_history`
+- `scraper_logs`
+
+## Risk Indicators
+
+The risk pipeline computes deterministic features from market data and stores them in `risk_indicators`.
+
+Current computed fields include:
+
+- `volatility_30d`
+- `rsi_14`
+- `volume_ratio`
+- `price_vs_52w_high`
+- `price_vs_sma50`
+- `beta` when available
+- deterministic volatility, momentum, and volume labels
 
 ## AI Pipeline
 
-- A future AI pipeline is planned as a lightweight backend module
-- It should remain simple and demo-friendly
-- It must write only to schema-approved structures such as existing prediction or signal tables
-- It must not introduce news, sentiment, Claude, or AI summary/chat tables
+The AI layer is intentionally simple and demo-friendly.
 
-## Scheduler and Jobs
+It currently produces:
 
-- Background jobs are planned for local scheduling only
-- Jobs can later support ETL refreshes, materialized view refreshes, and other approved local tasks
-- The scheduler is part of the backend design, not a separate infrastructure service
+- HMM-style market regimes into `hmm_states`
+- linear-regression price predictions into `ai_predictions`
+- rule-based trading signals into `market_signals`
+- simplified Bayesian-style risk scoring updates on `risk_indicators`
 
-## Database Triggers and Materialized Views
+## Portfolio, Trade, Alert, and Optimizer Flow
 
-- Schema v2 includes 6 triggers
-- Schema v2 includes 4 materialized views
-- Trigger behavior handles holdings, cash, alert logs, and prediction actual-price backfill
-- Materialized views provide read-friendly derived database outputs
+- Portfolios are user-scoped.
+- Trades insert into `trades` only.
+- Database triggers update:
+  - `portfolio_holdings`
+  - `portfolios.current_cash`
+  - `alert_logs`
+  - `ai_predictions.actual_price`
+- Alerts insert into `alerts`; the database creates logs later after qualifying price inserts.
+- Portfolio optimization writes to `portfolio_optimisation` using a simple demo-friendly optimizer.
 
-## Current Scope
+## Materialized Views and Triggers
 
-This repository currently documents and scaffolds the project only. It does not implement business features, authentication logic, ETL logic, AI logic, or production behavior yet.
+Schema v2 includes materialized views and triggers to keep important derived data in the database layer.
+
+Key trigger-managed behaviors:
+
+- holdings updates after trades
+- cash updates after trades
+- alert log creation after price inserts
+- prediction actual-price backfill after price inserts
+
+The application should not duplicate those trigger-managed responsibilities in Python.

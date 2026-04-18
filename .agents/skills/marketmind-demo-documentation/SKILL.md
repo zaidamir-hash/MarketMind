@@ -99,8 +99,8 @@ Project constraints to reflect in docs:
 ## Important Documentation Rules
 
 - Keep all setup instructions Windows-friendly unless otherwise specified
-- Use the project root path:
-  C:\Users\alize\Desktop\Uni Stuff\AI+DB+SDA Project
+- Use the current project root or a generic placeholder path such as:
+  `C:\path\to\MarketMind`
 - Prefer PowerShell commands when giving terminal examples
 - Keep instructions compatible with beginners
 - Avoid assuming Docker unless explicitly requested

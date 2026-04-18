@@ -1,75 +1,105 @@
 # MarketMind
 
-MarketMind is a local-only stock and crypto intelligence platform for learning, development, and demo use. This repository is a monorepo scaffold for a React frontend, a FastAPI backend, and a PostgreSQL database built around Database Schema v2.
+MarketMind is a local-only stock and crypto intelligence platform built for a university demo. The project combines a FastAPI backend, a React frontend, PostgreSQL Schema v2, yfinance-powered market ingestion, deterministic risk analytics, simple AI outputs, and portfolio/trade/alert workflows.
+
+## Current Scope
+
+Implemented layers:
+
+- FastAPI backend with JWT authentication
+- Assets API
+- Manual yfinance ETL for asset onboarding and price history
+- Risk indicator computation
+- AI outputs for regimes, predictions, signals, and simplified risk scoring
+- Portfolio, trade, alert, and optimizer APIs
+- React dashboard and workflow pages
+
+Out of scope by project decision:
+
+- Alembic
+- Docker
+- TypeScript
+- news/sentiment ingestion
+- Claude/chat/AI summary features
+- schema changes outside Database Schema v2
 
 ## Tech Stack
 
-- Frontend: React with JavaScript only and Vite
-- Backend: FastAPI
+- Frontend: React, Vite, JavaScript, Axios, Recharts
+- Backend: FastAPI, SQLAlchemy 2.0, Pydantic
 - Database: PostgreSQL
-- Data ingestion: yfinance for approved market data only
-- Analytics later: pandas, numpy, scikit-learn, hmmlearn, pgmpy, DEAP
-- Charts later: Recharts
-
-## Project Rules
-
-- Use Database Schema v2 only.
-- Use only `database/marketmind_schema_v2_postgresql.sql` as the schema source.
-- Do not add Alembic.
-- Do not add Docker.
-- Keep development local-only.
-- Do not add `SENTIMENT_SCORES`.
-- Do not add news tables, sentiment tables, Claude tables, or AI summary/chat tables.
-- Authentication will be a real JWT login system later, but it is not implemented yet.
-- AI work should stay simple and demo-friendly when it is added later.
+- Data ingestion: yfinance
+- Analytics: pandas, numpy, scikit-learn, hmmlearn, pgmpy, DEAP
 
 ## Repository Structure
 
-- `backend/` FastAPI project scaffold and backend dependency setup
-- `frontend/` React + Vite JavaScript project scaffold
-- `database/` executable PostgreSQL schema, verification SQL, and safe seed SQL
-- `docs/` project decisions, architecture notes, runbook, and build plan
-- `scripts/` PowerShell helper scripts for local checks
+- `database/`
+  The executable PostgreSQL schema, verification queries, and seed assets.
+- `backend/`
+  FastAPI app, ORM models, routers, services, ETL/AI modules, and tests.
+- `frontend/`
+  React + Vite app with pages, API services, auth handling, and dashboard UI.
+- `docs/`
+  Project decisions, architecture notes, runbook, and task plan.
+- `scripts/`
+  Local PowerShell environment check helpers.
 
-## Local-Only Setup
+## Database Rules
 
-This project is designed for local development only right now.
+- Schema source of truth: `database/marketmind_schema_v2_postgresql.sql`
+- Use executable SQL only
+- Do not add Alembic
+- Do not add `SENTIMENT_SCORES`, news tables, sentiment tables, Claude tables, or AI summary/chat tables
+- Database triggers are responsible for:
+  - holdings updates
+  - portfolio cash updates
+  - alert log creation
+  - `ai_predictions.actual_price` backfill
 
-- Run PostgreSQL locally.
-- Create and use a local `marketmind` database.
-- Run the backend locally from `backend/`.
-- Run the frontend locally from `frontend/`.
-- Use the PowerShell helper scripts in `scripts/` for quick environment checks.
-
-## Basic Development Order
+## Local Run Order
 
 1. Run the PostgreSQL schema from `database/marketmind_schema_v2_postgresql.sql`.
-2. Verify Schema v2 objects with `database/verification_queries.sql`.
-3. Optionally seed the demo asset universe from `database/seed_assets.sql`.
-4. Set up backend dependencies and environment variables.
-5. Set up frontend dependencies and environment variables.
-6. Build the project in phases using `docs/CODEX_TASK_PLAN.md`.
+2. Verify schema objects with `database/verification_queries.sql`.
+3. Optionally seed demo assets with `database/seed_assets.sql`.
+4. Start the backend from `backend/`.
+5. Start the frontend from `frontend/`.
 
-## Database Folder
+## Quick Start
 
-The `database/` folder contains:
+Database:
 
-- `marketmind_schema_v2_postgresql.sql`
-- `verification_queries.sql`
-- `seed_assets.sql`
+- Run the schema SQL in PostgreSQL
+- Use the runbook in [docs/DATABASE_RUNBOOK.md](C:/Users/alize/Desktop/Uni Stuff/AI+DB+SDA Project/docs/DATABASE_RUNBOOK.md)
 
-The schema file is the only database definition to use for this project.
+Backend:
 
-## Check Scripts
+1. `cd backend`
+2. `python -m venv .venv`
+3. `.\.venv\Scripts\activate`
+4. `pip install -r requirements.txt`
+5. `copy .env.example .env`
+6. Set `DATABASE_URL`, `POSTGRES_PASSWORD`, `JWT_SECRET_KEY`, and `FRONTEND_URL`
+7. `uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload`
 
-The `scripts/` folder contains local PowerShell helpers:
+Frontend:
 
-- `scripts/check_database.ps1`
-- `scripts/check_backend.ps1`
-- `scripts/check_frontend.ps1`
+1. `cd frontend`
+2. `copy .env.example .env`
+3. `npm.cmd install`
+4. `npm.cmd run dev -- --host 127.0.0.1 --port 5173`
 
-These scripts are for environment and setup checks only.
+Recommended local URLs:
 
-## Important Note
+- Frontend: `http://127.0.0.1:5173`
+- Backend: `http://127.0.0.1:8000`
 
-MarketMind must stay aligned with Schema v2. No news, sentiment, Claude, AI summary, or extra chat tables are allowed unless the project owner explicitly changes that decision later.
+## Demo Notes
+
+- ETL and risk recomputation depend on live yfinance availability.
+- Portfolio trades require stored prices first.
+- Alert logs only appear after a later price insert crosses the alert threshold.
+- Portfolio optimization requires at least two held assets with sufficient stored history.
+
+## Important Constraint
+
+MarketMind must stay aligned with Schema v2. Do not add news, sentiment, Claude, AI summary, or extra chat tables unless the project owner explicitly changes the scope.
