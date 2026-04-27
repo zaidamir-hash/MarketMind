@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import { ArrowLeft, LineChart, RefreshCcw, ShoppingCart, WalletCards } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
 import StatCard from "../components/StatCard.jsx";
 import { getApiErrorMessage } from "../services/api.js";
 import { getAssetCatalog } from "../services/assetsService.js";
@@ -203,35 +206,36 @@ export default function PortfolioDetail() {
 
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <p className="page-meta"><Link to="/portfolios">Back to portfolios</Link></p>
-          <h1>{portfolio.name}</h1>
-          <p>Review holdings, trade with the latest stored prices, and run optimization.</p>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Portfolio workspace"
+        title={portfolio.name}
+        description="Review holdings, trade with the latest stored prices, and run optimization."
+      >
+        <Link to="/portfolios" className="page-meta-link">
+          <ArrowLeft size={14} />
+          <span>Back to portfolios</span>
+        </Link>
+      </PageHeader>
 
-      <ErrorBanner message={error || message} onDismiss={() => { setError(""); setMessage(""); }} />
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+      <ErrorBanner message={message} tone="success" onDismiss={() => setMessage("")} />
 
       {performance ? (
         <div className="stats-grid">
-          <StatCard label="Current Cash" value={formatCurrency(performance.current_cash)} />
-          <StatCard label="Holdings Value" value={formatCurrency(performance.holdings_value)} />
-          <StatCard label="Total Value" value={formatCurrency(performance.total_portfolio_value)} />
-          <StatCard label="Total PnL" value={formatCurrency(performance.total_pnl)} />
-          <StatCard label="Return %" value={formatPercent(performance.return_pct)} />
-          <StatCard label="Priced Holdings" value={performance.priced_holdings} />
+          <StatCard label="Current Cash" value={formatCurrency(performance.current_cash)} icon={WalletCards} />
+          <StatCard label="Holdings Value" value={formatCurrency(performance.holdings_value)} icon={LineChart} />
+          <StatCard label="Total Value" value={formatCurrency(performance.total_portfolio_value)} icon={RefreshCcw} tone="success" />
+          <StatCard label="Total PnL" value={formatCurrency(performance.total_pnl)} icon={LineChart} tone={Number(performance.total_pnl) >= 0 ? "success" : "danger"} />
+          <StatCard label="Return %" value={formatPercent(performance.return_pct)} icon={LineChart} tone={Number(performance.return_pct) >= 0 ? "success" : "danger"} />
+          <StatCard label="Priced Holdings" value={performance.priced_holdings} icon={ShoppingCart} />
         </div>
       ) : null}
 
       <div className="content-grid two-column">
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Create Trade</h2>
-              <p>The backend inserts into `trades` only and lets DB triggers update holdings and cash.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Create Trade"
+          description="The backend inserts into trades only and lets database triggers update holdings and cash."
+        >
           {availableTradeCategories.length === 0 ? (
             <EmptyState
               title={tradeForm.trade_type === "SELL" ? "No sellable assets yet" : "Asset catalog unavailable"}
@@ -241,64 +245,68 @@ export default function PortfolioDetail() {
             />
           ) : (
             <form className="form-grid" onSubmit={handleTrade}>
-              <label className="form-field">
-                <span>Trade Type</span>
-                <select
-                  value={tradeForm.trade_type}
-                  onChange={(event) => setTradeForm((current) => ({ ...current, trade_type: event.target.value }))}
-                >
-                  <option value="BUY">BUY</option>
-                  <option value="SELL">SELL</option>
-                </select>
-              </label>
-              <label className="form-field">
-                <span>Category</span>
-                <select
-                  value={tradeForm.category_id}
-                  onChange={(event) => {
-                    const nextCategory = availableTradeCategories.find(
-                      (category) => category.category_id === event.target.value,
-                    );
-                    setTradeForm((current) => ({
-                      ...current,
-                      category_id: event.target.value,
-                      symbol: nextCategory?.options[0]?.symbol ?? "",
-                    }));
-                  }}
-                  required
-                >
-                  {availableTradeCategories.map((category) => (
-                    <option key={category.category_id} value={category.category_id}>
-                      {category.category_label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-field">
-                <span>Asset / Company</span>
-                <select
-                  value={tradeForm.symbol}
-                  onChange={(event) => setTradeForm((current) => ({ ...current, symbol: event.target.value }))}
-                  required
-                >
-                  {availableTradeOptions.map((option) => (
-                    <option key={option.symbol} value={option.symbol}>
-                      {option.display_name} ({option.symbol})
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-field">
-                <span>Quantity</span>
-                <input
-                  type="number"
-                  min="0.00000001"
-                  step="0.00000001"
-                  value={tradeForm.quantity}
-                  onChange={(event) => setTradeForm((current) => ({ ...current, quantity: event.target.value }))}
-                  required
-                />
-              </label>
+              <div className="form-row-two">
+                <label className="form-field">
+                  <span>Trade Type</span>
+                  <select
+                    value={tradeForm.trade_type}
+                    onChange={(event) => setTradeForm((current) => ({ ...current, trade_type: event.target.value }))}
+                  >
+                    <option value="BUY">BUY</option>
+                    <option value="SELL">SELL</option>
+                  </select>
+                </label>
+                <label className="form-field">
+                  <span>Category</span>
+                  <select
+                    value={tradeForm.category_id}
+                    onChange={(event) => {
+                      const nextCategory = availableTradeCategories.find(
+                        (category) => category.category_id === event.target.value,
+                      );
+                      setTradeForm((current) => ({
+                        ...current,
+                        category_id: event.target.value,
+                        symbol: nextCategory?.options[0]?.symbol ?? "",
+                      }));
+                    }}
+                    required
+                  >
+                    {availableTradeCategories.map((category) => (
+                      <option key={category.category_id} value={category.category_id}>
+                        {category.category_label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="form-row-two">
+                <label className="form-field">
+                  <span>Asset / Company</span>
+                  <select
+                    value={tradeForm.symbol}
+                    onChange={(event) => setTradeForm((current) => ({ ...current, symbol: event.target.value }))}
+                    required
+                  >
+                    {availableTradeOptions.map((option) => (
+                      <option key={option.symbol} value={option.symbol}>
+                        {option.display_name} ({option.symbol})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="form-field">
+                  <span>Quantity</span>
+                  <input
+                    type="number"
+                    min="0.00000001"
+                    step="0.00000001"
+                    value={tradeForm.quantity}
+                    onChange={(event) => setTradeForm((current) => ({ ...current, quantity: event.target.value }))}
+                    required
+                  />
+                </label>
+              </div>
               <p className="form-help">
                 {selectedTradeOption
                   ? `Selected asset: ${selectedTradeOption.display_name} (${selectedTradeOption.symbol})`
@@ -313,15 +321,12 @@ export default function PortfolioDetail() {
               </button>
             </form>
           )}
-        </div>
+        </SectionCard>
 
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Run Optimization</h2>
-              <p>Simple random-search optimizer using stored price history for held assets.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Run Optimization"
+          description="Simple random-search optimizer using stored price history for held assets."
+        >
           <form className="form-grid" onSubmit={handleOptimize}>
             <label className="form-field">
               <span>Iterations</span>
@@ -337,16 +342,13 @@ export default function PortfolioDetail() {
               {submitting ? "Optimizing..." : "Run Optimization"}
             </button>
           </form>
-        </div>
+        </SectionCard>
       </div>
 
-      <div className="card">
-        <div className="section-header">
-          <div>
-            <h2>Holdings</h2>
-            <p>Values shown here come from trigger-managed holdings plus latest stored prices.</p>
-          </div>
-        </div>
+      <SectionCard
+        title="Holdings"
+        description="Values shown here come from trigger-managed holdings plus the latest stored prices."
+      >
         {holdings.length === 0 ? (
           <EmptyState title="No holdings yet" description="Create BUY trades to populate this portfolio." />
         ) : (
@@ -381,16 +383,13 @@ export default function PortfolioDetail() {
             </table>
           </div>
         )}
-      </div>
+      </SectionCard>
 
       <div className="content-grid two-column">
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Recent Trades</h2>
-              <p>Latest trade activity for this portfolio.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Recent Trades"
+          description="Latest trade activity for this portfolio."
+        >
           {trades.length === 0 ? (
             <EmptyState title="No trades yet" description="Use the trade form above to create one." />
           ) : (
@@ -417,19 +416,16 @@ export default function PortfolioDetail() {
                       <td>{formatDateTime(trade.traded_at)}</td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Optimization History</h2>
-              <p>Saved rows from `portfolio_optimisation`.</p>
-            </div>
+              </tbody>
+            </table>
           </div>
+        )}
+        </SectionCard>
+
+        <SectionCard
+          title="Optimization History"
+          description="Saved rows from portfolio_optimisation."
+        >
           {optimizations.length === 0 ? (
             <EmptyState title="No optimization runs yet" description="Run optimization once holdings are ready." />
           ) : (
@@ -460,11 +456,11 @@ export default function PortfolioDetail() {
                       <td>{formatDateTime(row.created_at)}</td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+              </tbody>
+            </table>
+          </div>
+        )}
+        </SectionCard>
       </div>
     </section>
   );

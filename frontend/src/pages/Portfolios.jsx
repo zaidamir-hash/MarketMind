@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
+import { Landmark, PiggyBank, Star, WalletCards } from "lucide-react";
 import { Link } from "react-router-dom";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
+import StatCard from "../components/StatCard.jsx";
 import { getApiErrorMessage } from "../services/api.js";
 import { formatCurrency, formatDateTime } from "../services/formatters.js";
 import { createPortfolio, listPortfolios } from "../services/portfolioService.js";
@@ -61,25 +65,32 @@ export default function Portfolios() {
     return <LoadingSpinner label="Loading portfolios..." />;
   }
 
+  const totalCash = rows.reduce((sum, portfolio) => sum + Number(portfolio.current_cash ?? 0), 0);
+  const defaultCount = rows.filter((portfolio) => portfolio.is_default).length;
+
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <h1>Portfolios</h1>
-          <p>Create and manage your authenticated user portfolios.</p>
-        </div>
+      <PageHeader
+        eyebrow="Protected workspace"
+        title="Portfolios"
+        description="Create and manage your authenticated user portfolios."
+      />
+
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+      <ErrorBanner message={message} tone="success" onDismiss={() => setMessage("")} />
+
+      <div className="stats-grid">
+        <StatCard label="Portfolios" value={rows.length} hint="Authenticated user rows" icon={WalletCards} />
+        <StatCard label="Default Portfolios" value={defaultCount} hint="Marked as default" icon={Star} />
+        <StatCard label="Current Cash" value={formatCurrency(totalCash)} hint="Sum of current_cash across rows" icon={PiggyBank} tone="success" />
+        <StatCard label="Base Capital" value={formatCurrency(rows.reduce((sum, portfolio) => sum + Number(portfolio.initial_capital ?? 0), 0))} hint="Initial capital across portfolios" icon={Landmark} />
       </div>
 
-      <ErrorBanner message={error || message} onDismiss={() => { setError(""); setMessage(""); }} />
-
       <div className="content-grid two-column">
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Create Portfolio</h2>
-              <p>The backend will set `current_cash` equal to the initial capital.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Create Portfolio"
+          description="The backend will set current_cash equal to the initial capital."
+        >
 
           <form className="form-grid" onSubmit={handleCreate}>
             <label className="form-field">
@@ -116,15 +127,12 @@ export default function Portfolios() {
               {submitting ? "Creating..." : "Create Portfolio"}
             </button>
           </form>
-        </div>
+        </SectionCard>
 
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Your Portfolios</h2>
-              <p>Open a portfolio to trade, review holdings, and run optimization.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Your Portfolios"
+          description="Open a portfolio to trade, review holdings, and run optimization."
+        >
 
           {rows.length === 0 ? (
             <EmptyState title="No portfolios yet" description="Create your first portfolio to get started." />
@@ -138,13 +146,13 @@ export default function Portfolios() {
                   </div>
                   <div className="aligned-right">
                     <span>{formatCurrency(portfolio.current_cash)}</span>
-                    <small>{portfolio.is_default ? "Default" : "Standard"}</small>
+                    <small>{portfolio.is_default ? "Default portfolio" : "Standard portfolio"}</small>
                   </div>
                 </Link>
               ))}
             </div>
           )}
-        </div>
+        </SectionCard>
       </div>
     </section>
   );

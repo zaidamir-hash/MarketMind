@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BarChart3 } from "lucide-react";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
+import StatCard from "../components/StatCard.jsx";
 import { getApiErrorMessage } from "../services/api.js";
 import { formatDateTime, formatNumber } from "../services/formatters.js";
 import { listSignals } from "../services/aiService.js";
@@ -34,24 +38,31 @@ export default function Signals() {
   }
 
   const visibleRows = rows.filter((row) => !filter || row.symbol?.includes(filter.toUpperCase()));
+  const buyCount = rows.filter((row) => row.signal_type === "BUY").length;
+  const holdCount = rows.filter((row) => row.signal_type === "HOLD").length;
+  const sellCount = rows.filter((row) => row.signal_type === "SELL").length;
 
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <h1>Signals</h1>
-          <p>Latest BUY, HOLD, and SELL outputs from the rule-based signal generator.</p>
-        </div>
+      <PageHeader
+        eyebrow="AI outputs"
+        title="Signals"
+        description="Latest BUY, HOLD, and SELL outputs from the rule-based signal generator."
+      />
+
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+
+      <div className="stats-grid">
+        <StatCard label="Visible Signals" value={visibleRows.length} hint="Rows after local filtering" icon={BarChart3} />
+        <StatCard label="BUY" value={buyCount} hint="Positive rule-based signals" icon={ArrowUpRight} tone="success" />
+        <StatCard label="HOLD" value={holdCount} hint="Neutral holding guidance" icon={ArrowRightLeft} />
+        <StatCard label="SELL" value={sellCount} hint="Protective or downside calls" icon={ArrowDownRight} tone="danger" />
       </div>
 
-      <ErrorBanner message={error} onDismiss={() => setError("")} />
-
-      <div className="card">
-        <div className="section-header">
-          <div>
-            <h2>Signal Feed</h2>
-            <p>Filter locally by symbol.</p>
-          </div>
+      <SectionCard
+        title="Signal Feed"
+        description="Filter locally by symbol and compare strength, source, and detected regime."
+        actions={(
           <input
             className="search-input"
             type="text"
@@ -59,7 +70,8 @@ export default function Signals() {
             onChange={(event) => setFilter(event.target.value)}
             placeholder="Filter symbol"
           />
-        </div>
+        )}
+      >
 
         {visibleRows.length === 0 ? (
           <EmptyState title="No signals found" description="Run the AI pipeline first." />
@@ -80,10 +92,14 @@ export default function Signals() {
                 {visibleRows.map((row) => (
                   <tr key={row.signal_id}>
                     <td>{row.symbol}</td>
-                    <td>{row.signal_type}</td>
+                    <td>
+                      <span className={`badge ${row.signal_type === "BUY" ? "badge-success" : row.signal_type === "SELL" ? "badge-danger" : "badge-neutral"}`}>
+                        {row.signal_type}
+                      </span>
+                    </td>
                     <td>{row.model_source}</td>
                     <td>{formatNumber(row.strength)}</td>
-                    <td>{row.regime || "-"}</td>
+                    <td>{row.regime ? <span className="badge badge-info">{row.regime}</span> : "-"}</td>
                     <td>{formatDateTime(row.generated_at)}</td>
                   </tr>
                 ))}
@@ -91,7 +107,7 @@ export default function Signals() {
             </table>
           </div>
         )}
-      </div>
+      </SectionCard>
     </section>
   );
 }

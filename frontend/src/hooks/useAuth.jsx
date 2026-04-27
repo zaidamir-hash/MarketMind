@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   getCurrentUser,
   getStoredToken,
-  getStoredUser,
   login as loginRequest,
   logout as logoutRequest,
   register as registerRequest,
@@ -18,7 +17,7 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [token, setToken] = useState(getStoredToken());
-  const [currentUser, setCurrentUser] = useState(getStoredUser());
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(getStoredToken()));
 
   useEffect(() => {
@@ -36,9 +35,9 @@ export function AuthProvider({ children }) {
         const status = error?.response?.status;
         if (status === 401 || status === 403) {
           logoutRequest();
-          setCurrentUser(null);
-          setToken(null);
         }
+        setCurrentUser(null);
+        setToken(status === 401 || status === 403 ? null : getStoredToken());
       } finally {
         setLoading(false);
       }
@@ -109,7 +108,7 @@ export function AuthProvider({ children }) {
       value={{
         token,
         currentUser,
-        isAuthenticated: Boolean(token),
+        isAuthenticated: Boolean(token && currentUser),
         loading,
         login,
         register,

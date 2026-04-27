@@ -193,6 +193,8 @@ Protected API endpoints:
 
 - `POST /ai/run/{symbol}`
 - `POST /ai/run-all`
+- `POST /ai/reconcile-actuals`
+- `POST /ai/reconcile-actuals/{symbol}`
 
 Read endpoints:
 
@@ -207,11 +209,17 @@ CLI commands:
 
 - `python -m app.ai.run_ai_pipeline run AAPL`
 - `python -m app.ai.run_ai_pipeline run-all`
+- `python -m app.etl.run_prediction_actuals reconcile`
+- `python -m app.etl.run_prediction_actuals reconcile AAPL`
 
 Notes:
 
 - the AI modules are intentionally simple and stable for demo use
 - outputs depend on actual stored market data and will fail clearly if data is missing
+- `ai_predictions.actual_price` is filled from real stored `price_history` rows once a prediction has matured
+- the database trigger still backfills matching rows on new price inserts, and the backend also reconciles older missed predictions after price ETL or via the manual reconcile commands above
+- `GET /ai/predictions` prefers the newest backfilled comparable prediction per asset when one exists; otherwise it falls back to the newest pending prediction row
+- if price ETL has not yet fetched a real bar at or after `predicted_for`, `actual_price` remains `NULL` until relevant market data exists
 - Genetic Algorithm portfolio optimization is intentionally deferred until portfolio and holding APIs exist
 
 ## Portfolio APIs

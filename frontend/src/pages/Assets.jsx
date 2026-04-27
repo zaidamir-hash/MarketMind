@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { Database, PackageSearch, ShieldCheck, Sparkles } from "lucide-react";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
+import StatCard from "../components/StatCard.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 import {
   createAsset,
@@ -132,34 +136,43 @@ export default function Assets() {
     return <LoadingSpinner label="Loading assets..." />;
   }
 
+  const activeCount = assets.filter((asset) => asset.is_active).length;
+  const inactiveCount = assets.length - activeCount;
+  const cryptoCount = assets.filter((asset) => asset.asset_type === "CRYPTO").length;
+
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <h1>Assets</h1>
-          <p>Browse current assets, look up symbols, and manage asset metadata when authenticated.</p>
-        </div>
+      <PageHeader
+        eyebrow="Asset registry"
+        title="Assets"
+        description="Browse current assets, look up symbols, and manage asset metadata when authenticated."
+      />
+
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+      <ErrorBanner message={message} tone="success" onDismiss={() => setMessage("")} />
+
+      <div className="stats-grid">
+        <StatCard label="Visible Assets" value={assets.length} hint="Current table view" icon={Database} />
+        <StatCard label="Active" value={activeCount} hint="Marked active in backend" icon={Sparkles} tone="success" />
+        <StatCard label="Inactive" value={inactiveCount} hint="Soft-deactivated rows" icon={ShieldCheck} tone="warning" />
+        <StatCard label="Crypto Rows" value={cryptoCount} hint="CRYPTO asset_type rows" icon={PackageSearch} />
       </div>
 
-      <ErrorBanner message={error || message} onDismiss={() => { setError(""); setMessage(""); }} />
-
       <div className="content-grid two-column">
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Browse Assets</h2>
-              <p>Toggle active assets only or browse the full asset table.</p>
-            </div>
-          </div>
-          <label className="inline-toggle">
-            <input
-              type="checkbox"
-              checked={activeOnly}
-              onChange={(event) => setActiveOnly(event.target.checked)}
-            />
-            <span>Show active assets only</span>
-          </label>
-
+        <SectionCard
+          title="Browse Assets"
+          description="Toggle active assets only or browse the full asset table."
+          actions={(
+            <label className="inline-toggle">
+              <input
+                type="checkbox"
+                checked={activeOnly}
+                onChange={(event) => setActiveOnly(event.target.checked)}
+              />
+              <span>Show active only</span>
+            </label>
+          )}
+        >
           {assets.length === 0 ? (
             <EmptyState title="No assets found" description="Use the ETL tools or create an asset manually." />
           ) : (
@@ -179,11 +192,19 @@ export default function Assets() {
                 <tbody>
                   {assets.map((asset) => (
                     <tr key={asset.asset_id}>
-                      <td>{asset.symbol}</td>
+                      <td className="mono">{asset.symbol}</td>
                       <td>{asset.name}</td>
-                      <td>{asset.asset_type}</td>
+                      <td>
+                        <span className={`badge ${asset.asset_type === "CRYPTO" ? "badge-warning" : "badge-info"}`}>
+                          {asset.asset_type}
+                        </span>
+                      </td>
                       <td>{asset.exchange || "-"}</td>
-                      <td>{asset.is_active ? "Active" : "Inactive"}</td>
+                      <td>
+                        <span className={`badge ${asset.is_active ? "badge-success" : "badge-neutral"}`}>
+                          {asset.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
                       <td>{formatDateTime(asset.added_at)}</td>
                       {isAuthenticated ? (
                         <td>
@@ -211,16 +232,13 @@ export default function Assets() {
               </table>
             </div>
           )}
-        </div>
+        </SectionCard>
 
         <div className="stack-column">
-          <div className="card">
-            <div className="section-header">
-              <div>
-                <h2>Lookup by Symbol</h2>
-                <p>Query a specific asset using the backend symbol lookup route.</p>
-              </div>
-            </div>
+          <SectionCard
+            title="Lookup by Symbol"
+            description="Query a specific asset using the backend symbol lookup route."
+          >
             <form className="form-grid compact-form" onSubmit={handleLookup}>
               <label className="form-field">
                 <span>Symbol</span>
@@ -242,68 +260,76 @@ export default function Assets() {
                 <div>Exchange: {lookupResult.exchange || "-"}</div>
               </div>
             ) : null}
-          </div>
+          </SectionCard>
 
           {isAuthenticated ? (
-            <div className="card">
-              <div className="section-header">
-                <div>
-                  <h2>Create Asset</h2>
-                  <p>Manual asset creation for demo use when backend auth is available.</p>
-                </div>
-              </div>
+            <SectionCard
+              title="Create Asset"
+              description="Manual asset creation when backend auth is available."
+            >
               <form className="form-grid" onSubmit={handleCreate}>
-                <label className="form-field">
-                  <span>Symbol</span>
-                  <input
-                    type="text"
-                    value={assetForm.symbol}
-                    onChange={(event) => setAssetForm((current) => ({ ...current, symbol: event.target.value.toUpperCase() }))}
-                    required
-                  />
-                </label>
-                <label className="form-field">
-                  <span>Name</span>
-                  <input
-                    type="text"
-                    value={assetForm.name}
-                    onChange={(event) => setAssetForm((current) => ({ ...current, name: event.target.value }))}
-                    required
-                  />
-                </label>
-                <label className="form-field">
-                  <span>Asset Type</span>
-                  <select
-                    value={assetForm.asset_type}
-                    onChange={(event) => setAssetForm((current) => ({ ...current, asset_type: event.target.value }))}
-                  >
-                    <option value="STOCK">STOCK</option>
-                    <option value="CRYPTO">CRYPTO</option>
-                  </select>
-                </label>
-                <label className="form-field">
-                  <span>Exchange</span>
-                  <input
-                    type="text"
-                    value={assetForm.exchange}
-                    onChange={(event) => setAssetForm((current) => ({ ...current, exchange: event.target.value }))}
-                  />
-                </label>
+                <div className="form-row-two">
+                  <label className="form-field">
+                    <span>Symbol</span>
+                    <input
+                      type="text"
+                      value={assetForm.symbol}
+                      onChange={(event) => setAssetForm((current) => ({ ...current, symbol: event.target.value.toUpperCase() }))}
+                      required
+                    />
+                  </label>
+                  <label className="form-field">
+                    <span>Name</span>
+                    <input
+                      type="text"
+                      value={assetForm.name}
+                      onChange={(event) => setAssetForm((current) => ({ ...current, name: event.target.value }))}
+                      required
+                    />
+                  </label>
+                </div>
+                <div className="form-row-two">
+                  <label className="form-field">
+                    <span>Asset Type</span>
+                    <select
+                      value={assetForm.asset_type}
+                      onChange={(event) => setAssetForm((current) => ({ ...current, asset_type: event.target.value }))}
+                    >
+                      <option value="STOCK">STOCK</option>
+                      <option value="CRYPTO">CRYPTO</option>
+                    </select>
+                  </label>
+                  <label className="form-field">
+                    <span>Exchange</span>
+                    <input
+                      type="text"
+                      value={assetForm.exchange}
+                      onChange={(event) => setAssetForm((current) => ({ ...current, exchange: event.target.value }))}
+                    />
+                  </label>
+                </div>
                 <button type="submit" className="primary-button" disabled={saving}>
                   {saving ? "Saving..." : "Create Asset"}
                 </button>
               </form>
-            </div>
-          ) : null}
+            </SectionCard>
+          ) : (
+            <SectionCard
+              title="Manage Assets"
+              description="Mutation routes stay locked until a valid user session is available."
+            >
+              <EmptyState
+                title="Login required"
+                description="Authenticate to create, edit, or deactivate asset rows from the frontend."
+              />
+            </SectionCard>
+          )}
 
           {isAuthenticated && editForm ? (
-            <div className="card">
-              <div className="section-header">
-                <div>
-                  <h2>Edit Asset</h2>
-                  <p>Update selected asset metadata.</p>
-                </div>
-              </div>
+            <SectionCard
+              title="Edit Asset"
+              description="Update selected asset metadata without changing backend behavior."
+            >
               <form className="form-grid" onSubmit={handleUpdate}>
                 <label className="form-field">
                   <span>Symbol</span>
@@ -345,7 +371,7 @@ export default function Assets() {
                   </button>
                 </div>
               </form>
-            </div>
+            </SectionCard>
           ) : null}
         </div>
       </div>

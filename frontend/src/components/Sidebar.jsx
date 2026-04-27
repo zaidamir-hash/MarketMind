@@ -1,107 +1,118 @@
 import {
   Activity,
-  AlertTriangle,
-  BarChart3,
   BrainCircuit,
-  Database,
-  Gauge,
-  LayoutDashboard,
-  LineChart,
+  Lock,
   LogIn,
   LogOut,
-  PackageSearch,
-  ShieldCheck,
-  WalletCards,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
+import { protectedLinks, publicLinks } from "./navigationConfig.js";
 
-
-const publicLinks = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/assets", label: "Assets", icon: PackageSearch },
-  { to: "/risk-indicators", label: "Risk Indicators", icon: ShieldCheck },
-  { to: "/predictions", label: "Predictions", icon: LineChart },
-  { to: "/signals", label: "Signals", icon: BarChart3 },
-  { to: "/regimes", label: "Regimes", icon: Gauge },
-];
-
-const protectedLinks = [
-  { to: "/etl-tools", label: "ETL Tools", icon: Database },
-  { to: "/portfolios", label: "Portfolios", icon: WalletCards },
-  { to: "/alerts", label: "Alerts", icon: AlertTriangle },
-];
-
-
-function SidebarLink({ to, label, icon: Icon }) {
+function SidebarLink({ to, label, icon: Icon, requiresAuth = false, isAuthenticated, onClick }) {
   return (
     <NavLink
       to={to}
-      className={({ isActive }) => `sidebar-link ${isActive ? "is-active" : ""}`}
+      className={({ isActive }) => `sidebar-link ${isActive ? "is-active" : ""} ${requiresAuth ? "is-protected" : ""}`}
+      onClick={onClick}
     >
-      <Icon size={18} />
-      <span>{label}</span>
+      <div className="sidebar-link-content">
+        <Icon size={18} />
+        <span>{label}</span>
+      </div>
+      {requiresAuth && !isAuthenticated ? (
+        <span className="sidebar-link-badge">
+          <Lock size={12} />
+          Login
+        </span>
+      ) : null}
     </NavLink>
   );
 }
 
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen = false, onClose }) {
   const { currentUser, isAuthenticated, logout } = useAuth();
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="brand-mark">
-          <BrainCircuit size={18} />
-        </div>
-        <div>
-          <h1>MarketMind</h1>
-          <p>Local demo dashboard</p>
-        </div>
-      </div>
-
-      <nav className="sidebar-nav">
-        <div className="sidebar-group">
-          <span className="sidebar-group-title">Overview</span>
-          {publicLinks.map((link) => (
-            <SidebarLink key={link.to} {...link} />
-          ))}
-        </div>
-
-        <div className="sidebar-group">
-          <span className="sidebar-group-title">Workspace</span>
-          {protectedLinks.map((link) => (
-            <SidebarLink key={link.to} {...link} />
-          ))}
-        </div>
-      </nav>
-
-      <div className="sidebar-footer">
-        {isAuthenticated ? (
-          <>
-            <div className="sidebar-user">
-              <strong>{currentUser?.full_name || currentUser?.username}</strong>
-              <span>{currentUser?.email}</span>
+    <>
+      <button
+        type="button"
+        className={`sidebar-backdrop ${isOpen ? "is-visible" : ""}`}
+        aria-label="Close navigation menu"
+        onClick={onClose}
+      />
+      <aside className={`sidebar ${isOpen ? "is-open" : ""}`}>
+        <div className="sidebar-topbar">
+          <div className="sidebar-brand">
+            <div className="brand-mark">
+              <BrainCircuit size={18} />
             </div>
-            <button type="button" className="ghost-button full-width" onClick={logout}>
-              <LogOut size={16} />
-              <span>Logout</span>
-            </button>
-          </>
-        ) : (
-          <div className="sidebar-auth-links">
-            <NavLink className="ghost-button full-width" to="/login">
-              <LogIn size={16} />
-              <span>Login</span>
-            </NavLink>
-            <NavLink className="primary-button full-width" to="/register">
-              <Activity size={16} />
-              <span>Register</span>
-            </NavLink>
+            <div>
+              <h1>MarketMind</h1>
+              <p>Market intelligence platform</p>
+            </div>
           </div>
-        )}
-      </div>
-    </aside>
+        </div>
+
+        <nav className="sidebar-nav">
+          <div className="sidebar-group">
+            <span className="sidebar-group-title">Overview</span>
+            {publicLinks.map((link) => (
+              <SidebarLink
+                key={link.to}
+                {...link}
+                isAuthenticated={isAuthenticated}
+                onClick={onClose}
+              />
+            ))}
+          </div>
+
+          <div className="sidebar-group">
+            <span className="sidebar-group-title">Workspace</span>
+            {protectedLinks.map((link) => (
+              <SidebarLink
+                key={link.to}
+                {...link}
+                isAuthenticated={isAuthenticated}
+                onClick={onClose}
+              />
+            ))}
+          </div>
+        </nav>
+
+        <div className="sidebar-footer">
+          {isAuthenticated ? (
+            <>
+              <div className="sidebar-user">
+                <span className="sidebar-user-label">Authenticated workspace</span>
+                <strong>{currentUser?.full_name || currentUser?.username}</strong>
+                <span>{currentUser?.email}</span>
+              </div>
+              <button type="button" className="ghost-button full-width" onClick={logout}>
+                <LogOut size={16} />
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <div className="sidebar-auth-links">
+              <div className="sidebar-user sidebar-user-guest">
+                <span className="sidebar-user-label">Guest mode</span>
+                <strong>Public analytics available</strong>
+                <span>Login to access ETL, portfolios, trades, and alerts.</span>
+              </div>
+              <NavLink className="ghost-button full-width" to="/login" onClick={onClose}>
+                <LogIn size={16} />
+                <span>Login</span>
+              </NavLink>
+              <NavLink className="primary-button full-width" to="/register" onClick={onClose}>
+                <Activity size={16} />
+                <span>Register</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+      </aside>
+    </>
   );
 }

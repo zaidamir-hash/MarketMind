@@ -11,6 +11,7 @@ from app.schemas.ai import (
     AIBatchResponse,
     AIPipelineResponse,
     HMMStateRead,
+    PredictionActualsReconcileResponse,
     PredictionRead,
     SignalRead,
 )
@@ -25,6 +26,7 @@ from app.services.ai_service import (
     run_ai_pipeline_for_all_active_assets,
     run_ai_pipeline_for_asset,
 )
+from app.services.prediction_actuals_service import reconcile_prediction_actuals
 
 
 router = APIRouter(prefix="/ai", tags=["AI"])
@@ -93,6 +95,27 @@ def run_ai_pipeline_all(
         message="AI pipeline finished for active assets.",
         details=items,
     )
+
+
+@router.post("/reconcile-actuals", response_model=PredictionActualsReconcileResponse)
+def reconcile_prediction_actuals_all(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> PredictionActualsReconcileResponse:
+    _ = current_user
+    result = reconcile_prediction_actuals(db)
+    return PredictionActualsReconcileResponse(**result)
+
+
+@router.post("/reconcile-actuals/{symbol}", response_model=PredictionActualsReconcileResponse)
+def reconcile_prediction_actuals_for_symbol(
+    symbol: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> PredictionActualsReconcileResponse:
+    _ = current_user
+    result = reconcile_prediction_actuals(db, symbol=symbol)
+    return PredictionActualsReconcileResponse(**result)
 
 
 @router.get("/predictions/symbol/{symbol}", response_model=PredictionRead)

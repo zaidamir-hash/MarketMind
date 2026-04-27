@@ -19,6 +19,15 @@ dist/
 backend/.env
 frontend/.env
 
+# Codex / private workflow artifacts
+/.agents/
+/AGENTS.md
+/docs/CODEX_TASK_PLAN.md
+
+# Private proposal documents
+/MarketMind_Proposal_Final.docx
+/Market_Mind_SDA_FINAL proposalll.docx
+
 # OS / editors
 .DS_Store
 Thumbs.db

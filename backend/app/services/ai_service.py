@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import desc, select
+from sqlalchemy import case, desc, select
 from sqlalchemy.orm import Session
 
 from app.ai.bayesian_risk_model import compute_bayesian_risk_for_asset
@@ -70,6 +70,10 @@ def run_ai_pipeline_for_all_active_assets(db: Session) -> list[dict[str, object]
 
 
 def _latest_predictions_query(active_only: bool = True):
+    actual_priority = case(
+        (AIPrediction.actual_price.is_not(None), 0),
+        else_=1,
+    )
     ranked_subquery = (
         select(
             AIPrediction.prediction_id.label("prediction_id"),
@@ -77,6 +81,7 @@ def _latest_predictions_query(active_only: bool = True):
             AIPrediction.created_at.label("created_at"),
             Asset.symbol.label("symbol"),
             Asset.is_active.label("is_active"),
+            actual_priority.label("actual_priority"),
         )
         .join(Asset, Asset.asset_id == AIPrediction.asset_id)
         .subquery()
@@ -89,10 +94,12 @@ def _latest_predictions_query(active_only: bool = True):
             ranked_subquery.c.is_active,
             ranked_subquery.c.prediction_id,
             ranked_subquery.c.created_at,
+            ranked_subquery.c.actual_priority,
         )
         .distinct(ranked_subquery.c.asset_id)
         .order_by(
             ranked_subquery.c.asset_id,
+            ranked_subquery.c.actual_priority.asc(),
             ranked_subquery.c.created_at.desc(),
             ranked_subquery.c.prediction_id.desc(),
         )
@@ -201,11 +208,15 @@ def list_latest_predictions(
 
 def get_latest_prediction_for_asset(db: Session, symbol: str) -> tuple[AIPrediction, str] | None:
     normalized_symbol = normalize_symbol(symbol)
+    actual_priority = case(
+        (AIPrediction.actual_price.is_not(None), 0),
+        else_=1,
+    )
     statement = (
         select(AIPrediction, Asset.symbol)
         .join(Asset, Asset.asset_id == AIPrediction.asset_id)
         .where(Asset.symbol == normalized_symbol)
-        .order_by(AIPrediction.created_at.desc(), AIPrediction.prediction_id.desc())
+        .order_by(actual_priority.asc(), AIPrediction.created_at.desc(), AIPrediction.prediction_id.desc())
         .limit(1)
     )
     return db.execute(statement).first()

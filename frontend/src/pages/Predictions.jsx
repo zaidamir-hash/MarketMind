@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { BrainCircuit, CalendarClock, CheckCircle2 } from "lucide-react";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
+import StatCard from "../components/StatCard.jsx";
 import { getApiErrorMessage } from "../services/api.js";
 import { listPredictions } from "../services/aiService.js";
 import { formatDateTime, formatNumber } from "../services/formatters.js";
@@ -34,24 +38,30 @@ export default function Predictions() {
   }
 
   const visibleRows = rows.filter((row) => !filter || row.symbol?.includes(filter.toUpperCase()));
+  const actualPriceCount = rows.filter((row) => row.actual_price !== null && row.actual_price !== undefined).length;
+  const highConfidenceCount = rows.filter((row) => Number(row.confidence) >= 0.7).length;
 
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <h1>Predictions</h1>
-          <p>Latest LinearRegression predictions produced by the backend AI pipeline.</p>
-        </div>
+      <PageHeader
+        eyebrow="AI outputs"
+        title="Predictions"
+        description="Latest LinearRegression predictions produced by the backend AI pipeline."
+      />
+
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+
+      <div className="stats-grid">
+        <StatCard label="Visible Predictions" value={visibleRows.length} hint="Rows after local filtering" icon={BrainCircuit} />
+        <StatCard label="Stored Predictions" value={rows.length} hint="Latest fetched feed size" icon={CalendarClock} />
+        <StatCard label="Actual Price Filled" value={actualPriceCount} hint="Trigger-managed backfill rows" icon={CheckCircle2} tone="success" />
+        <StatCard label="High Confidence" value={highConfidenceCount} hint="confidence >= 0.70" icon={BrainCircuit} tone="warning" />
       </div>
 
-      <ErrorBanner message={error} onDismiss={() => setError("")} />
-
-      <div className="card">
-        <div className="section-header">
-          <div>
-            <h2>Prediction Feed</h2>
-            <p>Filter locally by symbol.</p>
-          </div>
+      <SectionCard
+        title="Prediction Feed"
+        description="Filter locally by symbol and review the latest backend prediction rows."
+        actions={(
           <input
             className="search-input"
             type="text"
@@ -59,7 +69,8 @@ export default function Predictions() {
             onChange={(event) => setFilter(event.target.value)}
             placeholder="Filter symbol"
           />
-        </div>
+        )}
+      >
 
         {visibleRows.length === 0 ? (
           <EmptyState title="No predictions found" description="Run the AI pipeline first." />
@@ -93,7 +104,7 @@ export default function Predictions() {
             </table>
           </div>
         )}
-      </div>
+      </SectionCard>
     </section>
   );
 }

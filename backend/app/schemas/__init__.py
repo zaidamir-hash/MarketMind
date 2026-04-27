@@ -7,6 +7,7 @@ from app.schemas.ai import (
     AIPipelineRequest,
     AIPipelineResponse,
     HMMStateRead,
+    PredictionActualsReconcileResponse,
     PredictionRead,
     SignalRead,
 )
@@ -52,6 +53,7 @@ __all__ = [
     "PortfolioPerformanceRead",
     "PortfolioRead",
     "PortfolioUpdate",
+    "PredictionActualsReconcileResponse",
     "PredictionRead",
     "RegisterRequest",
     "RiskIndicatorBatchItem",

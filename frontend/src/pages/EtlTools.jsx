@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
+import { Database, RefreshCcw, Workflow } from "lucide-react";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
+import StatCard from "../components/StatCard.jsx";
 import { fetchPricesForAllActive, fetchPricesForSymbol, listEtlLogs, onboardAsset } from "../services/etlService.js";
 import { getApiErrorMessage } from "../services/api.js";
 import { formatDateTime } from "../services/formatters.js";
+
+const periodOptions = ["1d", "5d", "1mo", "3mo", "6mo", "1y"];
+const intervalOptions = ["5m", "15m", "30m", "1h", "1d"];
 
 
 export default function EtlTools() {
@@ -59,25 +66,31 @@ export default function EtlTools() {
     return <LoadingSpinner label="Loading ETL tools..." />;
   }
 
+  const successCount = logs.filter((log) => log.status === "SUCCESS").length;
+  const failureCount = logs.filter((log) => log.status === "FAIL").length;
+
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <h1>ETL Tools</h1>
-          <p>Manually run yfinance onboarding and price-fetch jobs through the protected backend routes.</p>
-        </div>
+      <PageHeader
+        eyebrow="Protected workspace"
+        title="ETL Tools"
+        description="Manually run yfinance onboarding and price-fetch jobs through the protected backend routes."
+      />
+
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+      <ErrorBanner message={message} tone="success" onDismiss={() => setMessage("")} />
+
+      <div className="stats-grid">
+        <StatCard label="Visible Job Logs" value={logs.length} hint="Latest rows fetched into the page" icon={Database} />
+        <StatCard label="Successful Jobs" value={successCount} hint="SUCCESS rows in current view" icon={Workflow} tone="success" />
+        <StatCard label="Failed Jobs" value={failureCount} hint="FAIL rows in current view" icon={RefreshCcw} tone="warning" />
       </div>
 
-      <ErrorBanner message={error || message} onDismiss={() => { setError(""); setMessage(""); }} />
-
       <div className="content-grid three-column">
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Onboard Asset</h2>
-              <p>Create or update an asset from yfinance metadata.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Onboard Asset"
+          description="Create or update an asset from yfinance metadata."
+        >
           <form
             className="form-grid compact-form"
             onSubmit={(event) => {
@@ -98,15 +111,12 @@ export default function EtlTools() {
               {submitting ? "Running..." : "Onboard"}
             </button>
           </form>
-        </div>
+        </SectionCard>
 
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Fetch Prices</h2>
-              <p>Pull one symbol's OHLCV rows into `price_history`.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Fetch Prices"
+          description="Pull one symbol's OHLCV rows into price_history using preset period and interval options."
+        >
           <form
             className="form-grid compact-form"
             onSubmit={(event) => {
@@ -128,33 +138,37 @@ export default function EtlTools() {
             </label>
             <label className="form-field">
               <span>Period</span>
-              <input
-                type="text"
+              <select
                 value={priceForm.period}
                 onChange={(event) => setPriceForm((current) => ({ ...current, period: event.target.value }))}
-              />
+              >
+                {periodOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </label>
             <label className="form-field">
               <span>Interval</span>
-              <input
-                type="text"
+              <select
                 value={priceForm.interval}
                 onChange={(event) => setPriceForm((current) => ({ ...current, interval: event.target.value }))}
-              />
+              >
+                {intervalOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </label>
+            <p className="form-help">Use shorter intervals for intraday candles and 1d for longer windows.</p>
             <button type="submit" className="secondary-button" disabled={submitting}>
               Fetch Symbol Prices
             </button>
           </form>
-        </div>
+        </SectionCard>
 
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Fetch All Active</h2>
-              <p>Run the batch fetch for every active asset.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Fetch All Active"
+          description="Run the batch fetch for every active asset with the same yfinance window."
+        >
           <form
             className="form-grid compact-form"
             onSubmit={(event) => {
@@ -167,34 +181,38 @@ export default function EtlTools() {
           >
             <label className="form-field">
               <span>Period</span>
-              <input
-                type="text"
+              <select
                 value={batchForm.period}
                 onChange={(event) => setBatchForm((current) => ({ ...current, period: event.target.value }))}
-              />
+              >
+                {periodOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </label>
             <label className="form-field">
               <span>Interval</span>
-              <input
-                type="text"
+              <select
                 value={batchForm.interval}
                 onChange={(event) => setBatchForm((current) => ({ ...current, interval: event.target.value }))}
-              />
+              >
+                {intervalOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </label>
+            <p className="form-help">Batch mode is useful after onboarding or when refreshing the curated asset universe.</p>
             <button type="submit" className="secondary-button" disabled={submitting}>
               Fetch All Active
             </button>
           </form>
-        </div>
+        </SectionCard>
       </div>
 
-      <div className="card">
-        <div className="section-header">
-          <div>
-            <h2>Recent ETL Logs</h2>
-            <p>Latest rows from `scraper_logs`.</p>
-          </div>
-        </div>
+      <SectionCard
+        title="Recent Scraper Logs"
+        description="Latest rows from scraper_logs, including ETL and downstream pipeline jobs."
+      >
 
         {logs.length === 0 ? (
           <EmptyState title="No ETL logs yet" description="Run onboarding or price jobs to populate logs." />
@@ -215,7 +233,11 @@ export default function EtlTools() {
                 {logs.map((log) => (
                   <tr key={log.log_id}>
                     <td>{log.job_name}</td>
-                    <td>{log.status}</td>
+                    <td>
+                      <span className={`badge ${log.status === "SUCCESS" ? "badge-success" : "badge-danger"}`}>
+                        {log.status}
+                      </span>
+                    </td>
                     <td>{log.rows_inserted ?? "-"}</td>
                     <td>{formatDateTime(log.started_at)}</td>
                     <td>{formatDateTime(log.finished_at)}</td>
@@ -226,7 +248,7 @@ export default function EtlTools() {
             </table>
           </div>
         )}
-      </div>
+      </SectionCard>
     </section>
   );
 }

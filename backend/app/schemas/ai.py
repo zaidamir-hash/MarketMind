@@ -80,3 +80,12 @@ class AIBatchResponse(BaseModel):
     status: str
     message: str
     details: list[AIBatchItem]
+
+
+class PredictionActualsReconcileResponse(BaseModel):
+    status: str
+    message: str
+    symbol: str | None = None
+    scanned: int
+    updated: int
+    remaining: int

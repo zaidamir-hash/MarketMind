@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { AlertTriangle, BellRing, Siren, Waves } from "lucide-react";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorBanner from "../components/ErrorBanner.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import SectionCard from "../components/SectionCard.jsx";
+import StatCard from "../components/StatCard.jsx";
 import { createAlert, deactivateAlert, listAlertLogs, listAlerts } from "../services/alertService.js";
 import { getApiErrorMessage } from "../services/api.js";
 import { formatDateTime, formatNumber } from "../services/formatters.js";
@@ -82,25 +86,31 @@ export default function Alerts() {
     return <LoadingSpinner label="Loading alerts..." />;
   }
 
+  const activeCount = alerts.filter((alert) => alert.is_active).length;
+
   return (
     <section className="page-shell">
-      <div className="page-header">
-        <div>
-          <h1>Alerts</h1>
-          <p>Create price alerts, manage active rules, and inspect trigger-generated alert logs.</p>
-        </div>
+      <PageHeader
+        eyebrow="Protected workspace"
+        title="Alerts"
+        description="Create price alerts, manage active rules, and inspect trigger-generated alert logs."
+      />
+
+      <ErrorBanner message={error} tone="error" onDismiss={() => setError("")} />
+      <ErrorBanner message={message} tone="success" onDismiss={() => setMessage("")} />
+
+      <div className="stats-grid">
+        <StatCard label="Alerts" value={alerts.length} hint="Current user alert rows" icon={AlertTriangle} />
+        <StatCard label="Active Alerts" value={activeCount} hint="Still eligible to trigger" icon={BellRing} tone="warning" />
+        <StatCard label="Alert Logs" value={logs.length} hint="Trigger-created rows" icon={Siren} tone="success" />
+        <StatCard label="View Filter" value={activeOnly ? "Active" : "All"} hint="Current rules filter" icon={Waves} />
       </div>
 
-      <ErrorBanner message={error || message} onDismiss={() => { setError(""); setMessage(""); }} />
-
       <div className="content-grid two-column">
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Create Alert</h2>
-              <p>The app inserts into `alerts`; the database trigger writes `alert_logs` later.</p>
-            </div>
-          </div>
+        <SectionCard
+          title="Create Alert"
+          description="The app inserts into alerts; the database trigger writes alert_logs later."
+        >
 
           <form className="form-grid" onSubmit={handleCreate}>
             <label className="form-field">
@@ -137,23 +147,22 @@ export default function Alerts() {
               {submitting ? "Creating..." : "Create Alert"}
             </button>
           </form>
-        </div>
+        </SectionCard>
 
-        <div className="card">
-          <div className="section-header">
-            <div>
-              <h2>Alert Rules</h2>
-              <p>Filter the authenticated user's alerts.</p>
-            </div>
-          </div>
-          <label className="inline-toggle">
-            <input
-              type="checkbox"
-              checked={activeOnly}
-              onChange={(event) => setActiveOnly(event.target.checked)}
-            />
-            <span>Show active alerts only</span>
-          </label>
+        <SectionCard
+          title="Alert Rules"
+          description="Filter the authenticated user's alerts."
+          actions={(
+            <label className="inline-toggle">
+              <input
+                type="checkbox"
+                checked={activeOnly}
+                onChange={(event) => setActiveOnly(event.target.checked)}
+              />
+              <span>Show active only</span>
+            </label>
+          )}
+        >
 
           {alerts.length === 0 ? (
             <EmptyState title="No alerts yet" description="Create an alert to watch a stored asset price." />
@@ -171,15 +180,19 @@ export default function Alerts() {
                   </tr>
                 </thead>
                 <tbody>
-                  {alerts.map((alert) => (
-                    <tr key={alert.alert_id}>
-                      <td>{alert.symbol}</td>
-                      <td>{alert.condition}</td>
-                      <td>{formatNumber(alert.threshold)}</td>
-                      <td>{alert.is_active ? "Active" : "Inactive"}</td>
-                      <td>{formatDateTime(alert.created_at)}</td>
-                      <td>
-                        {alert.is_active ? (
+                {alerts.map((alert) => (
+                  <tr key={alert.alert_id}>
+                    <td>{alert.symbol}</td>
+                    <td><span className="badge badge-info">{alert.condition}</span></td>
+                    <td>{formatNumber(alert.threshold)}</td>
+                    <td>
+                      <span className={`badge ${alert.is_active ? "badge-success" : "badge-neutral"}`}>
+                        {alert.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td>{formatDateTime(alert.created_at)}</td>
+                    <td>
+                      {alert.is_active ? (
                           <button
                             type="button"
                             className="link-button danger-text"
@@ -193,20 +206,17 @@ export default function Alerts() {
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+              </tbody>
+            </table>
+          </div>
+        )}
+        </SectionCard>
       </div>
 
-      <div className="card">
-        <div className="section-header">
-          <div>
-            <h2>Alert Logs</h2>
-            <p>Rows created automatically by the database trigger after price inserts.</p>
-          </div>
-        </div>
+      <SectionCard
+        title="Alert Logs"
+        description="Rows created automatically by the database trigger after matching price inserts."
+      >
 
         {logs.length === 0 ? (
           <EmptyState title="No alert logs yet" description="Matching price inserts have not fired any alerts yet." />
@@ -232,7 +242,7 @@ export default function Alerts() {
             </table>
           </div>
         )}
-      </div>
+      </SectionCard>
     </section>
   );
 }

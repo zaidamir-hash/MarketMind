@@ -69,7 +69,7 @@ Out of scope by project decision:
 Database:
 
 - Run the schema SQL in PostgreSQL
-- Use the runbook in [docs/DATABASE_RUNBOOK.md](C:/Users/alize/Desktop/Uni Stuff/AI+DB+SDA Project/docs/DATABASE_RUNBOOK.md)
+- Use the runbook in [docs/DATABASE_RUNBOOK.md](docs/DATABASE_RUNBOOK.md)
 
 Backend:
 

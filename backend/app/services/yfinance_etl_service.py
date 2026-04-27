@@ -15,6 +15,7 @@ from app.etl.etl_utils import (
 )
 from app.etl.yfinance_client import fetch_asset_metadata, fetch_price_history
 from app.services.asset_service import get_asset_by_symbol
+from app.services.prediction_actuals_service import reconcile_prediction_actuals
 from app.services.scraper_log_service import (
     create_scraper_log_start,
     finish_scraper_log_fail,
@@ -118,6 +119,8 @@ def fetch_prices_for_asset(
         )
         result = db.execute(insert_stmt)
         db.commit()
+
+        reconcile_prediction_actuals(db, symbol=normalized_symbol)
 
         inserted_count = result.rowcount if result.rowcount is not None and result.rowcount > 0 else 0
         finish_scraper_log_success(db, log, rows_inserted=inserted_count)

@@ -26,9 +26,11 @@ api.interceptors.response.use(
   (error) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url ?? "";
+    const detail = error.response?.data?.detail;
+    const isInactiveUser = status === 403 && detail === "Inactive user.";
 
     if (
-      status === 401
+      (status === 401 || isInactiveUser)
       && !requestUrl.includes("/auth/login")
       && !requestUrl.includes("/auth/token")
       && !requestUrl.includes("/auth/register")
@@ -44,10 +46,24 @@ api.interceptors.response.use(
 
 export function getApiErrorMessage(error) {
   const status = error?.response?.status;
+  const detail = error?.response?.data?.detail;
 
-  if (error?.response?.data?.detail) {
-    const { detail } = error.response.data;
-    return typeof detail === "string" ? detail : JSON.stringify(detail);
+  if (Array.isArray(detail)) {
+    const validationMessages = detail
+      .map((item) => item?.msg)
+      .filter(Boolean)
+      .join(" ");
+    if (validationMessages) {
+      return validationMessages;
+    }
+  }
+
+  if (typeof detail === "string" && detail.trim()) {
+    if (status === 403 && detail === "Inactive user.") {
+      return "Your account is inactive. Contact the project owner or register a different local user.";
+    }
+
+    return detail;
   }
 
   if (status === 401) {
@@ -59,11 +75,11 @@ export function getApiErrorMessage(error) {
   }
 
   if (status === 404) {
-    return "The frontend called a backend route that was not found.";
+    return "This screen requested a backend route that was not found.";
   }
 
   if (status && status >= 500) {
-    return "The backend returned a server error. Check the FastAPI terminal logs.";
+    return "The backend returned a server error. Check the FastAPI terminal logs for details.";
   }
 
   if (error?.request && !error?.response) {
